@@ -1,8 +1,11 @@
 from fastapi import FastAPI
-from app.database import engine
 from sqlalchemy import text
 
+from app.database import Base, engine
+from app import models
+
 app = FastAPI(title="NFL Game Predictor")
+Base.metadata.create_all(bind=engine)
 
 
 @app.get("/health")
