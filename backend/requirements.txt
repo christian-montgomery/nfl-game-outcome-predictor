@@ -3,3 +3,5 @@ uvicorn[standard]==0.30.6
 sqlalchemy
 psycopg2-binary
 python-dotenv
+pandas
+nfl_data_py

@@ -16,6 +16,7 @@ class Game(Base):
     __tablename__ = "games"
     
     id: Mapped[int] = mapped_column(primary_key=True)
+    game_id: Mapped[str] = mapped_column(String(20), unique=True, index=True)
     season: Mapped[int] = mapped_column(Integer)
     week: Mapped[int] = mapped_column(Integer)
     game_date: Mapped[datetime] = mapped_column(DateTime)
