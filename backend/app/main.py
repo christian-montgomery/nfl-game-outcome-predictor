@@ -1,11 +1,14 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.database import Base, engine
+from app.database import Base, engine, SessionLocal
 from app import models
+from app.routers import games
 
 app = FastAPI(title="NFL Game Predictor")
 Base.metadata.create_all(bind=engine)
+
+app.include_router(games.router)
 
 
 @app.get("/health")
