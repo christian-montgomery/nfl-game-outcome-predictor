@@ -3,12 +3,13 @@ from sqlalchemy import text
 
 from app.database import Base, engine, SessionLocal
 from app import models
-from app.routers import games
+from app.routers import games, teams
 
 app = FastAPI(title="NFL Game Predictor")
 Base.metadata.create_all(bind=engine)
 
 app.include_router(games.router)
+app.include_router(teams.router)
 
 
 @app.get("/health")
