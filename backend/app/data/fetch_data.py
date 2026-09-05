@@ -61,6 +61,6 @@ if __name__ == "__main__":
     db = SessionLocal()
     try:
         load_teams(db)
-        load_games(db, seasons=[2023])
+        load_games(db, seasons=[2019, 2020, 2021, 2022, 2023])
     finally:
         db.close()

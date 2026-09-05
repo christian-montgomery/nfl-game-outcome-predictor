@@ -12,7 +12,9 @@ env/
 .DS_Store
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/launch.json
+!.vscode/settings.json
 .idea/
 
 # Node (for later, once frontend is set up)
