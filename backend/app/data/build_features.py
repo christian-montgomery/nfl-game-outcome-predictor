@@ -44,7 +44,7 @@ def load_games_as_dataframe(db):
     
     return pd.DataFrame(rows)
 
-def add_rolling_features(df):
+def add_features(df):
     df = df.sort_values(by=["team", "game_date"]).reset_index(drop=True)
     df["rolling_points_for"] = (
         df.groupby("team")["points_for"]
@@ -58,6 +58,7 @@ def add_rolling_features(df):
         df.groupby("team")["won"]
         .transform(lambda x: x.shift(1).rolling(ROLLING_WINDOW, min_periods=1).mean())
     )
+    df["rest_days"] = df.groupby(["team", "season"])["game_date"].transform(lambda x: x.diff().dt.days)
     
     return df
 
@@ -80,6 +81,7 @@ def save_features(db, df):
             rolling_points_for=float(rpf) if pd.notnull(rpf) else None,
             rolling_points_against=float(rpa) if pd.notnull(rpa) else None,
             rolling_win_pct=float(row["rolling_win_pct"]) if pd.notnull(rwp) else None,
+            rest_days=float(row["rest_days"]) if pd.notnull(row["rest_days"]) else None,
         )
         db.add(feature)
         inserted += 1
@@ -93,7 +95,7 @@ if __name__ == "__main__":
         long_df = load_games_as_dataframe(db)
         print(f"Loaded {len(long_df)} team-game rows from {long_df['game_id'].nunique()} games")
         
-        featured_df = add_rolling_features(long_df)
+        featured_df = add_features(long_df)
         save_features(db, featured_df)
     finally:
         db.close()
