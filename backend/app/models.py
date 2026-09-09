@@ -43,6 +43,7 @@ class TeamGameFeature(Base):
     
     rolling_points_for: Mapped[float | None] = mapped_column(Float, nullable=True)
     rolling_points_against: Mapped[float | None] = mapped_column(Float, nullable=True)
+    rolling_win_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
     
     game: Mapped["Game"] = relationship("Game", backref="team_game_features")
     team: Mapped["Team"] = relationship("Team", backref="team_game_features")

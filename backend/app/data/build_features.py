@@ -25,6 +25,7 @@ def load_games_as_dataframe(db):
             "opponent": game.away_team.abbreviation,
             "points_for": game.home_score,
             "points_against": game.away_score,
+            "won": game.home_score > game.away_score,
             "is_home": True,
         })
         rows.append({
@@ -37,6 +38,7 @@ def load_games_as_dataframe(db):
             "opponent": game.home_team.abbreviation,
             "points_for": game.away_score,
             "points_against": game.home_score,
+            "won": game.away_score > game.home_score,
             "is_home": False,
         })
     
@@ -52,6 +54,10 @@ def add_rolling_features(df):
         df.groupby("team")["points_against"]
         .transform(lambda x: x.shift(1).rolling(ROLLING_WINDOW, min_periods=1).mean())
     )
+    df["rolling_win_pct"] = (
+        df.groupby("team")["won"]
+        .transform(lambda x: x.shift(1).rolling(ROLLING_WINDOW, min_periods=1).mean())
+    )
     
     return df
 
@@ -65,6 +71,7 @@ def save_features(db, df):
     for _, row in df.iterrows():
         rpf = row["rolling_points_for"]
         rpa = row["rolling_points_against"]
+        rwp = row["rolling_win_pct"]
         
         feature = models.TeamGameFeature(
             game_id=row["game_id"],
@@ -72,6 +79,7 @@ def save_features(db, df):
             is_home=bool(row["is_home"]),
             rolling_points_for=float(rpf) if pd.notnull(rpf) else None,
             rolling_points_against=float(rpa) if pd.notnull(rpa) else None,
+            rolling_win_pct=float(row["rolling_win_pct"]) if pd.notnull(rwp) else None,
         )
         db.add(feature)
         inserted += 1
